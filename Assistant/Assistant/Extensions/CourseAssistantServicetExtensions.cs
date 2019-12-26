@@ -12,6 +12,7 @@ namespace Assistant.Extensions
         public static void AddCourseAssistantService(this IServiceCollection services)
         {
             services.AddScoped<ICourseUserService, CourseUserService>();
+            services.AddScoped<ICourseService, CourseService>();
         }
     }
 }
