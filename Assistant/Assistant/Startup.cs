@@ -13,6 +13,8 @@ using Assistant.Data;
 using Assistant.Models;
 using Microsoft.EntityFrameworkCore;
 using Assistant.Extensions;
+using Blazored.Modal;
+using Blazored.Toast;
 
 namespace Assistant
 {
@@ -41,6 +43,8 @@ namespace Assistant
 
             services.AddCourseAssistantService();
 
+            services.AddBlazoredModal();
+            services.AddBlazoredToast();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

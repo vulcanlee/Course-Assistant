@@ -1,5 +1,15 @@
-﻿@inject ICourseUserService CourseUserService
-<h3>CourseUser</h3>
+﻿@page "/Users"
+@inject ICourseUserService CourseUserService
+@inject IModalService Modal
+@inject IToastService toastService
+
+<h3>使用者</h3>
+
+<div>
+    <input type="button" class="btn btn-primary" value="Add Task"
+           @onclick="Add" />
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -13,21 +23,133 @@
             <tr>
                 <td>@toDoItem.Name</td>
                 <td>
-                    <input type="button" class="btn btn-primary" value="Edit" />
-                    <input type="button" class="btn btn-danger" value="Delete" />
+                    <input type="button" class="btn btn-primary" value="Edit"
+                           @onclick="()=>Update(toDoItem)" />
+                    <input type="button" class="btn btn-danger" value="Delete"
+                           @onclick="()=>Delete(toDoItem)" />
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<div>
-    <input type="button" data-toggle="modal" data-target="#taskModal" class="btn btn-primary" value="Add Task" />
-</div>
 @code {
     List<CourseUser> courseUsers = new List<CourseUser>();
+    CourseUser currentCourseUser;
+    CourseUserRecordModel courseUserRecordModel;
     protected override async Task OnInitializedAsync()
     {
+        await Reload();
+    }
+
+    async Task Reload()
+    {
         courseUsers = await CourseUserService.RetriveAsync();
+    }
+
+    void Add()
+    {
+        courseUserRecordModel = new CourseUserRecordModel()
+        {
+            Id = 0,
+            Name = "",
+            Password = "",
+            Roles = ""
+        };
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordItem", courseUserRecordModel);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        Modal.OnClose += OnUpdateModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<CourseUserItem>("新增紀錄", parameters);
+    }
+
+    void Update(CourseUser courseUser)
+    {
+        currentCourseUser = courseUser;
+        courseUserRecordModel = new CourseUserRecordModel()
+        {
+            Id = currentCourseUser.Id,
+            Name = currentCourseUser.Name,
+            Password = "",
+            Roles = currentCourseUser.Roles
+        };
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordItem", courseUserRecordModel);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        Modal.OnClose += OnUpdateModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<CourseUserItem>("修改紀錄", parameters);
+    }
+    // 修改紀錄對話窗的事件被觸發所要執行的委派方法
+    async void OnUpdateModalClosed(ModalResult modalResult)
+    {
+        //解除該對話窗所綁定的事件
+        Modal.OnClose -= OnUpdateModalClosed;
+        // 檢查使用者是否有點選確認按鈕
+        if (modalResult.Cancelled)
+        {
+            toastService.ShowInfo("取消修改紀錄", "通知");
+        }
+        else
+        {
+            // 若使用者點選了確定按鈕
+            if (courseUserRecordModel.Id == 0)
+            {
+                CourseUser courseUser = new CourseUser()
+                {
+                    Name = courseUserRecordModel.Name,
+                    Roles = courseUserRecordModel.Roles,
+                };
+                await CourseUserService.CreateAsync(courseUser);
+                toastService.ShowSuccess("紀錄已經新增", "通知");
+
+            }
+            else
+            {
+                currentCourseUser.Name = courseUserRecordModel.Name;
+                currentCourseUser.Roles = courseUserRecordModel.Roles;
+                await CourseUserService.UpdateAsync(currentCourseUser.Id, currentCourseUser);
+                toastService.ShowSuccess("紀錄已經更新", "通知");
+            }
+            await Reload();
+            toastService.ShowInfo("重新更新資料", "通知");
+            StateHasChanged();
+        }
+    }
+    void Delete(CourseUser courseUser)
+    {
+        currentCourseUser = courseUser;
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordTitleName", courseUser.Name);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        Modal.OnClose += OnDeleteModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<ConfirmDelete>("刪除警告", parameters);
+    }
+    // 刪除對話窗的事件被觸發所要執行的委派方法
+    async void OnDeleteModalClosed(ModalResult modalResult)
+    {
+        //解除該對話窗所綁定的事件
+        Modal.OnClose -= OnDeleteModalClosed;
+        // 檢查使用者是否有點選確認按鈕
+        if (modalResult.Cancelled)
+        {
+            toastService.ShowInfo("取消刪除", "通知");
+        }
+        else
+        {
+            // 若使用者點選了確定按鈕
+            await CourseUserService.DeleteAsync(currentCourseUser.Id);
+            toastService.ShowSuccess("紀錄已經刪除", "通知");
+            await Reload();
+            StateHasChanged();
+        }
     }
 }
