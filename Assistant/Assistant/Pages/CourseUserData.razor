@@ -1,0 +1,33 @@
+﻿@inject ICourseUserService CourseUserService
+<h3>CourseUser</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>姓名</th>
+            <th>功能</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var toDoItem in courseUsers)
+        {
+            <tr>
+                <td>@toDoItem.Name</td>
+                <td>
+                    <input type="button" class="btn btn-primary" value="Edit" />
+                    <input type="button" class="btn btn-danger" value="Delete" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <input type="button" data-toggle="modal" data-target="#taskModal" class="btn btn-primary" value="Add Task" />
+</div>
+@code {
+    List<CourseUser> courseUsers = new List<CourseUser>();
+    protected override async Task OnInitializedAsync()
+    {
+        courseUsers = await CourseUserService.RetriveAsync();
+    }
+}
