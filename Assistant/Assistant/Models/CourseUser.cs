@@ -12,5 +12,7 @@ namespace Assistant.Models
         public Guid Salt { get; set; } 
         public string PasswordHash { get; set; }
         public string Roles { get; set; }
+        public DateTime Created { get; set; }
+        public int OrderCode { get; set; }
     }
 }

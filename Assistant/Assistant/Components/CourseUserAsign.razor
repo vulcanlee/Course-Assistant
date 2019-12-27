@@ -1,0 +1,146 @@
+﻿@inject IModalService ModalService
+@inject ICourseUserService CourseUserService
+@inject IToastService toastService
+
+<div class="row">
+    <div class="col-9">
+        <div class="row p-2">
+            <div class="float-right">
+                <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>功能</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var RecItem in courseUsers)
+                    {
+                        <tr>
+                            <td>@RecItem.Name</td>
+                            <td>
+                                @if (AddOrRemoveTitle(RecItem) == "加入")
+                                {
+                                    <input type="button" class="btn btn-primary" value="加入"
+                                           @onclick="() => DoAddOrRemove(RecItem)" />
+                                }
+                                else
+                                {
+                                    <input type="button" class="btn btn-danger" value="移除"
+                                           @onclick="() => DoAddOrRemove(RecItem)" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div>
+                <button @onclick="SubmitForm" class="btn btn-primary">確定</button>
+                <button @onclick="Cancel" class="btn btn-secondary">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] ModalParameters Parameters { get; set; }
+
+    Course RecordItem { get; set; }
+
+    PagedResult<CourseUser> pagedResult;
+    int currentPage = 1;
+    int pageSize = 5;
+    List<CourseUser> chooseCourseUsers = new List<CourseUser>();
+    List<CourseUser> courseUsers = new List<CourseUser>();
+
+    protected override async void OnInitialized()
+    {
+        // 透過傳遞來的參數，取得當前記事的名稱
+        RecordItem = Parameters.Get<Course>("RecordItem");
+        chooseCourseUsers.Clear();
+        foreach (var item in RecordItem.CourseUsers)
+        {
+            chooseCourseUsers.Add(item);
+        }
+        await Reload();
+    }
+
+    void SubmitForm()
+    {
+        //使用者確定要刪除，回應 ModalResult.Ok
+        RecordItem.CourseUsers.Clear();
+        foreach (var item in chooseCourseUsers)
+        {
+            RecordItem.CourseUsers.Add(item);
+        }
+        ModalService.Close(ModalResult.Ok($""));
+    }
+
+    void Cancel()
+    {
+        //使用者取消刪除，回應 ModalResult.Close
+        ModalService.Close(ModalResult.Cancel());
+    }
+    async Task Reload()
+    {
+        //courseUsers = await CourseUserService.RetriveAsync();
+        pagedResult = await CourseUserService.GetPagedAsync(currentPage, pageSize);
+        courseUsers = pagedResult.Results.ToList();
+    }
+    async void PagerPageChanged(int page)
+    {
+        currentPage = page;
+        await Reload();
+        StateHasChanged();
+    }
+
+    string AddOrRemoveTitle(CourseUser user)
+    {
+        string result = "加入";
+        var foo = chooseCourseUsers.FirstOrDefault(x => x.Id == user.Id);
+        if (foo != null)
+        {
+            result = "移除";
+        }
+        //try
+        //{
+        //    bool found = false;
+        //    foreach (var item in chooseCourseUsers)
+        //    {
+        //        if (item.Id == user.Id)
+        //        {
+        //            found = true;
+        //            break;
+        //        }
+        //    }
+        //    if (found == true)
+        //    {
+        //        result = "移除";
+
+        //    }
+        //    //var foo = chooseCourseUsers.FirstOrDefault(x => x.Id == user.Id);
+        //    //if (foo != null)
+        //    //{
+        //    //    result = "移除";
+        //    //}
+        //}
+        //catch { }
+        return result;
+    }
+    void DoAddOrRemove(CourseUser user)
+    {
+        var foo = chooseCourseUsers.FirstOrDefault(x => x.Id == user.Id);
+        if (foo != null)
+        {
+            chooseCourseUsers.Remove(foo);
+        }
+        else
+        {
+            chooseCourseUsers.Add(user);
+        }
+    }
+}

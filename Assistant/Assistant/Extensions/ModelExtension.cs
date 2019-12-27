@@ -21,5 +21,23 @@ namespace Assistant.Extensions
             newCourseUser.Name = courseUser.Name;
             return newCourseUser;
         }
+        public static Course Clone(this Course courseUser)
+        {
+            Course newCourseUser = new Course()
+            {
+                Id = courseUser.Id,
+                Name = courseUser.Name,
+                CourseCode = courseUser.CourseCode,
+                Description = courseUser.Description,
+                CourseUsers = new List<CourseUser>()
+            };
+
+            foreach (var item in courseUser.CourseUsers)
+            {
+                var user = item.Clone();
+                newCourseUser.CourseUsers.Add(user);
+            }
+            return newCourseUser;
+        }
     }
 }

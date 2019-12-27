@@ -19,8 +19,8 @@
             <th>代碼</th>
             <th>課程名稱</th>
             <th>說明</th>
+            <th>設定</th>
             <th>功能</th>
-            <th>指定</th>
         </tr>
     </thead>
     <tbody>
@@ -31,11 +31,13 @@
                 <td>@RecItem.Name</td>
                 <td>@RecItem.Description</td>
                 <td>
+                    <input type="button" class="btn btn-outline-primary" value="使用者 @RecItem.CourseUsers.Count"
+                           @onclick="()=>AssignUser(RecItem)" />
+                </td>
+                <td>
                     <input type="button" class="btn btn-primary" value="修改"
                            @onclick="()=>Update(RecItem)" />
                     <input type="button" class="btn btn-danger" value="刪除"
-                           @onclick="()=>Delete(RecItem)" />
-                    <input type="button" class="btn btn-outline-primary" value="使用者"
                            @onclick="()=>Delete(RecItem)" />
                 </td>
             </tr>
@@ -144,12 +146,12 @@
             StateHasChanged();
         }
     }
-    void Delete(Course courseUser)
+    void Delete(Course course)
     {
-        currentRecord = courseUser;
+        currentRecord = course;
         var parameters = new ModalParameters();
         // 宣告要傳遞給刪除對話窗的參數
-        parameters.Add("RecordTitleName", courseUser.Name);
+        parameters.Add("RecordTitleName", course.Name);
 
         // 綁定使用者關閉對話窗的觸發事件
         Modal.OnClose += OnDeleteModalClosed;
@@ -171,6 +173,37 @@
             // 若使用者點選了確定按鈕
             await CourseService.DeleteAsync(currentRecord.Id);
             toastService.ShowSuccess("紀錄已經刪除", "通知");
+            await Reload();
+            StateHasChanged();
+        }
+    }
+    void AssignUser(Course course)
+    {
+        currentRecord = course;
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordItem", currentRecord);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        Modal.OnClose += OnAsignUserModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<CourseUserAsign>("設定使用者", parameters);
+    }
+    // 更新使用者設定對話窗的事件被觸發所要執行的委派方法
+    async void OnAsignUserModalClosed(ModalResult modalResult)
+    {
+        //解除該對話窗所綁定的事件
+        Modal.OnClose -= OnAsignUserModalClosed;
+        // 檢查使用者是否有點選確認按鈕
+        if (modalResult.Cancelled)
+        {
+            toastService.ShowInfo("取消使用者設定", "通知");
+        }
+        else
+        {
+            // 若使用者點選了確定按鈕
+            await CourseService.UpdateAsync(currentRecord.Id, currentRecord);
+            toastService.ShowSuccess("使用者設定完成", "通知");
             await Reload();
             StateHasChanged();
         }

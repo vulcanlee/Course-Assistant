@@ -48,6 +48,11 @@ namespace Assistant.Services
 
         public async Task UpdateAsync(int id, Course courseUser)
         {
+            myDbContext.Entry(courseUser).State = EntityState.Modified;
+            await myDbContext.SaveChangesAsync();
+            return;
+
+
             var fooItem = await RetriveAsync(id);
             if (fooItem != null)
             {
@@ -55,7 +60,20 @@ namespace Assistant.Services
                 fooItem.CourseCode = courseUser.CourseCode;
                 fooItem.Description = courseUser.Description;
                 fooItem.CourseUsers = courseUser.CourseUsers;
+                myDbContext.Entry(fooItem).State = EntityState.Modified;
+
+                //myDbContext.Entry(fooItem).CurrentValues.SetValues(courseUser);
+                //myDbContext.Update(fooItem);
+
+
+
+                //fooItem.CourseUsers.Clear();
+                //foreach (var item in courseUser.CourseUsers)
+                //{
+                //    fooItem.CourseUsers.Add(item);
+                //}
                 await myDbContext.SaveChangesAsync();
+
             }
         }
 
