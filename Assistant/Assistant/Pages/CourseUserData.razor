@@ -16,6 +16,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th>帳號</th>
             <th>姓名</th>
             <th>功能</th>
         </tr>
@@ -24,6 +25,7 @@
         @foreach (var RecItem in courseUsers)
         {
             <tr>
+                <td>@RecItem.Account</td>
                 <td>@RecItem.Name</td>
                 <td>
                     <input type="button" class="btn btn-primary" value="修改"
@@ -46,13 +48,11 @@
     CourseUserRecordModel courseUserRecordModel;
     protected override async Task OnInitializedAsync()
     {
-        //var foo = await CourseUserService.GetPagedAsync(6, 10);
         await Reload();
     }
 
     async Task Reload()
     {
-        //courseUsers = await CourseUserService.RetriveAsync();
         pagedResult = await CourseUserService.GetPagedAsync(currentPage, pageSize);
         courseUsers = pagedResult.Results.ToList();
     }
@@ -69,7 +69,10 @@
             Id = 0,
             Name = "",
             Password = "",
-            Roles = ""
+            Roles = "",
+            Account = "",
+            IsAdmin = false,
+            OrderCode = 0
         };
         var parameters = new ModalParameters();
         // 宣告要傳遞給刪除對話窗的參數
@@ -89,7 +92,10 @@
             Id = currentCourseUser.Id,
             Name = currentCourseUser.Name,
             Password = "",
-            Roles = currentCourseUser.Roles
+            Roles = currentCourseUser.Roles,
+            Account = currentCourseUser.Account,
+            IsAdmin = currentCourseUser.IsAdmin,
+            OrderCode = currentCourseUser.OrderCode,
         };
         var parameters = new ModalParameters();
         // 宣告要傳遞給刪除對話窗的參數
@@ -119,15 +125,21 @@
                 {
                     Name = courseUserRecordModel.Name,
                     Roles = courseUserRecordModel.Roles,
+                    Account = courseUserRecordModel.Account,
+                    Created = DateTime.Now,
+                    IsAdmin = courseUserRecordModel.IsAdmin,
+                    OrderCode = courseUserRecordModel.OrderCode,
                 };
                 await CourseUserService.CreateAsync(courseUser);
                 toastService.ShowSuccess("紀錄已經新增", "通知");
-
             }
             else
             {
                 currentCourseUser.Name = courseUserRecordModel.Name;
                 currentCourseUser.Roles = courseUserRecordModel.Roles;
+                currentCourseUser.Account = courseUserRecordModel.Account;
+                currentCourseUser.IsAdmin = courseUserRecordModel.IsAdmin;
+                currentCourseUser.OrderCode = courseUserRecordModel.OrderCode;
                 await CourseUserService.UpdateAsync(currentCourseUser.Id, currentCourseUser);
                 toastService.ShowSuccess("紀錄已經更新", "通知");
             }
@@ -141,7 +153,7 @@
         currentCourseUser = courseUser;
         var parameters = new ModalParameters();
         // 宣告要傳遞給刪除對話窗的參數
-        parameters.Add("RecordTitleName", courseUser.Name);
+        parameters.Add("RecordTitleName", courseUser.Account);
 
         // 綁定使用者關閉對話窗的觸發事件
         Modal.OnClose += OnDeleteModalClosed;

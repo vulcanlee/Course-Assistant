@@ -60,8 +60,8 @@ namespace Assistant
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-                myDbContext.Database.Migrate();
             }
+            myDbContext.Database.Migrate();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

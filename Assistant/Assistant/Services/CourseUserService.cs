@@ -20,7 +20,7 @@ namespace Assistant.Services
 
         public async Task<List<CourseUser>> RetriveAsync()
         {
-            return await myDbContext.CourseUsers.ToListAsync();
+            return await myDbContext.CourseUsers.OrderBy(x=>x.OrderCode).ThenByDescending(x=>x.Created).ToListAsync();
         }
         public async Task<CourseUser> RetriveAsync(int id)
         {
@@ -29,7 +29,7 @@ namespace Assistant.Services
 
         public async Task<PagedResult<CourseUser>> GetPagedAsync(int page, int pageSize)
         {
-            return await myDbContext.CourseUsers.GetPaged(page, pageSize);
+            return await myDbContext.CourseUsers.OrderBy(x => x.OrderCode).ThenByDescending(x => x.Created).GetPaged(page, pageSize);
         }
         public async Task CreateAsync(CourseUser courseUser)
         {
@@ -56,6 +56,10 @@ namespace Assistant.Services
                 fooItem.PasswordHash = courseUser.PasswordHash;
                 fooItem.Roles = courseUser.Roles;
                 fooItem.Salt = courseUser.Salt;
+                fooItem.Account = courseUser.Account;
+                fooItem.IsAdmin = courseUser.IsAdmin;
+                fooItem.OrderCode = courseUser.OrderCode;
+                fooItem.Created = courseUser.Created;
                 await myDbContext.SaveChangesAsync();
             }
         }

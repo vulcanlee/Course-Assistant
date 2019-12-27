@@ -15,6 +15,7 @@ namespace Assistant.Models
         //protected override void OnConfiguring(DbContextOptionsBuilder options)
         //    => options.UseSqlite("Data Source=MyNote.db");
         public DbSet<CourseUser> CourseUsers { get; set; }
-           public DbSet<Course> Courses { get; set; }
- }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<QuestionAnswer> QuestionAnswers { get; set; }
+    }
 }
