@@ -42,6 +42,9 @@ namespace Assistant.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
@@ -56,7 +59,16 @@ namespace Assistant.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CourseId");
+
                     b.ToTable("CourseUsers");
+                });
+
+            modelBuilder.Entity("Assistant.Models.CourseUser", b =>
+                {
+                    b.HasOne("Assistant.Models.Course", null)
+                        .WithMany("CourseUsers")
+                        .HasForeignKey("CourseId");
                 });
 #pragma warning restore 612, 618
         }

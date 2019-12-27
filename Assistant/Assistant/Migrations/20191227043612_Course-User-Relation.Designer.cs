@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Assistant.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20191226071413_Init")]
-    partial class Init
+    [Migration("20191227043612_Course-User-Relation")]
+    partial class CourseUserRelation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -18,10 +18,33 @@ namespace Assistant.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.0");
 
+            modelBuilder.Entity("Assistant.Models.Course", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CourseCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Courses");
+                });
+
             modelBuilder.Entity("Assistant.Models.CourseUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CourseId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -38,7 +61,16 @@ namespace Assistant.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CourseId");
+
                     b.ToTable("CourseUsers");
+                });
+
+            modelBuilder.Entity("Assistant.Models.CourseUser", b =>
+                {
+                    b.HasOne("Assistant.Models.Course", null)
+                        .WithMany("CourseUsers")
+                        .HasForeignKey("CourseId");
                 });
 #pragma warning restore 612, 618
         }

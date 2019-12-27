@@ -1,4 +1,6 @@
-﻿using Assistant.Models;
+﻿using Assistant.DataModels;
+using Assistant.Extensions;
+using Assistant.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,11 +20,15 @@ namespace Assistant.Services
 
         public async Task<List<Course>> RetriveAsync()
         {
-            return await myDbContext.Courses.ToListAsync();
+            return await myDbContext.Courses.Include(x=>x.CourseUsers).ToListAsync();
         }
         public async Task<Course> RetriveAsync(int id)
         {
-            return await myDbContext.Courses.FirstOrDefaultAsync(x => x.Id == id);
+            return await myDbContext.Courses.Include(x => x.CourseUsers).FirstOrDefaultAsync(x => x.Id == id);
+        }
+        public async Task<PagedResult<Course>> GetPagedAsync(int page, int pageSize)
+        {
+            return await myDbContext.Courses.Include(x => x.CourseUsers).GetPaged(page, pageSize);
         }
         public async Task CreateAsync(Course courseUser)
         {
@@ -48,8 +54,10 @@ namespace Assistant.Services
                 fooItem.Name = courseUser.Name;
                 fooItem.CourseCode = courseUser.CourseCode;
                 fooItem.Description = courseUser.Description;
+                fooItem.CourseUsers = courseUser.CourseUsers;
                 await myDbContext.SaveChangesAsync();
             }
         }
+
     }
 }

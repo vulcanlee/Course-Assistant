@@ -1,4 +1,6 @@
-﻿using Assistant.Models;
+﻿using Assistant.DataModels;
+using Assistant.Extensions;
+using Assistant.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,11 @@ namespace Assistant.Services
         public async Task<CourseUser> RetriveAsync(int id)
         {
             return await myDbContext.CourseUsers.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<PagedResult<CourseUser>> GetPagedAsync(int page, int pageSize)
+        {
+            return await myDbContext.CourseUsers.GetPaged(page, pageSize);
         }
         public async Task CreateAsync(CourseUser courseUser)
         {
