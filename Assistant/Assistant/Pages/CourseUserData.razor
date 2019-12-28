@@ -2,6 +2,7 @@
 @inject ICourseUserService CourseUserService
 @inject IModalService Modal
 @inject IToastService toastService
+@attribute [Authorize(Roles = "Admin")]
 
 <h3>使用者</h3>
 
@@ -39,7 +40,7 @@
 </table>
 
 @code {
-    PagedResult<CourseUser> pagedResult;
+    PagedResult<CourseUser> pagedResult = new PagedResult<CourseUser>();
     int currentPage = 1;
     int pageSize = 5;
 
@@ -50,7 +51,12 @@
     {
         await Reload();
     }
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+        }
+    }
     async Task Reload()
     {
         pagedResult = await CourseUserService.GetPagedAsync(currentPage, pageSize);
@@ -119,6 +125,7 @@
         else
         {
             // 若使用者點選了確定按鈕
+            Guid guid = Guid.NewGuid();
             if (courseUserRecordModel.Id == 0)
             {
                 CourseUser courseUser = new CourseUser()
@@ -129,6 +136,8 @@
                     Created = DateTime.Now,
                     IsAdmin = courseUserRecordModel.IsAdmin,
                     OrderCode = courseUserRecordModel.OrderCode,
+                    Salt = guid,
+                    PasswordHash = PasswordHelper.GetPassowrdHash(guid, courseUserRecordModel.Password)
                 };
                 await CourseUserService.CreateAsync(courseUser);
                 toastService.ShowSuccess("紀錄已經新增", "通知");
@@ -140,6 +149,13 @@
                 currentCourseUser.Account = courseUserRecordModel.Account;
                 currentCourseUser.IsAdmin = courseUserRecordModel.IsAdmin;
                 currentCourseUser.OrderCode = courseUserRecordModel.OrderCode;
+
+                if (string.IsNullOrEmpty(courseUserRecordModel.Password) == false)
+                {
+                    currentCourseUser.PasswordHash =
+                        PasswordHelper.GetPassowrdHash(currentCourseUser.Salt, courseUserRecordModel.Password);
+                }
+
                 await CourseUserService.UpdateAsync(currentCourseUser.Id, currentCourseUser);
                 toastService.ShowSuccess("紀錄已經更新", "通知");
             }

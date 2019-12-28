@@ -19,5 +19,6 @@ namespace Assistant.Models
         public bool IsAdmin { get; set; }
         public DateTime Created { get; set; }
         public int OrderCode { get; set; }
+        public List<CourseCourseUser> CourseCourseUsers { get; set; }
     }
 }

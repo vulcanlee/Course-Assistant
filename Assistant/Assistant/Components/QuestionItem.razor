@@ -1,0 +1,38 @@
+﻿@inject IModalService ModalService
+
+<div style="width:700px;">
+    <div class="p-2">
+        <EditForm Model="@RecordItem" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="name">問題主題</label>
+                <InputText id="name" class="form-control" @bind-Value="@RecordItem.QuestionTitle" />
+            </div>
+            <div class="form-group">
+                <label for="name">問題說明</label>
+                <InputTextArea id="name" class="form-control" @bind-Value="@RecordItem.QuestionDescription" />
+            </div>
+            <button type="submit" class="btn btn-primary">儲存</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] ModalParameters Parameters { get; set; }
+
+    // 這筆記事的名稱
+    QuestionAnswerRecordModel RecordItem { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // 透過傳遞來的參數，取得當前記事的名稱
+        RecordItem = Parameters.Get<QuestionAnswerRecordModel>("RecordItem");
+    }
+
+    void HandleValidSubmit()
+    {
+        //使用者確定要刪除，回應 ModalResult.Ok
+        ModalService.Close(ModalResult.Ok($""));
+    }
+}

@@ -18,18 +18,20 @@ namespace Assistant.Services
             this.myDbContext = myDbContext;
         }
 
-        public async Task<List<QuestionAnswer>> RetriveAsync()
+        public async Task<List<QuestionAnswer>> RetriveAsync(Course course)
         {
-            return await myDbContext.QuestionAnswers.ToListAsync();
+            return await myDbContext.QuestionAnswers.Where(x=>x.Course == course)
+                .OrderByDescending(x=>x.Created).ToListAsync();
         }
         public async Task<QuestionAnswer> RetriveAsync(int id)
         {
             return await myDbContext.QuestionAnswers.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<PagedResult<QuestionAnswer>> GetPagedAsync(int page, int pageSize)
+        public async Task<PagedResult<QuestionAnswer>> GetPagedAsync(Course course, int page, int pageSize)
         {
-            return await myDbContext.QuestionAnswers.GetPaged(page, pageSize);
+            return await myDbContext.QuestionAnswers.Where(x => x.Course == course)
+                .OrderByDescending(x => x.Created).GetPaged(page, pageSize);
         }
         public async Task CreateAsync(QuestionAnswer courseUser)
         {
@@ -62,5 +64,6 @@ namespace Assistant.Services
                 await myDbContext.SaveChangesAsync();
             }
         }
+
     }
 }

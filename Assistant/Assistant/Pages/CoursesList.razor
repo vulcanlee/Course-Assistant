@@ -3,57 +3,85 @@
 @inject IModalService Modal
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
+@inject UserIdentity UserIdentity
 
-<h3>課程清單</h3>
+@attribute [Authorize(Roles = "User")]
 
-<div>
-    <div class="float-right">
-        <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
+@if (showQuestionAnswer == false)
+{
+    <h3>課程清單</h3>
+
+    <div>
+        <div class="float-right">
+            <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
+        </div>
     </div>
-</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>代碼</th>
-            <th>課程名稱</th>
-            <th>說明</th>
-            <th>功能</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var RecItem in courseUsers)
-        {
+    <table class="table">
+        <thead>
             <tr>
-                <td>@RecItem.CourseCode</td>
-                <td>@RecItem.Name</td>
-                <td>@RecItem.Description</td>
-                <td>
-                    <input type="button" class="btn btn-primary" value="問答"
-                           @onclick="()=>GotoQA(RecItem)" />
-                </td>
+                <th>代碼</th>
+                <th>課程名稱</th>
+                <th>說明</th>
+                <th>功能</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var RecItem in courseUsers)
+            {
+                <tr>
+                    <td>@RecItem.CourseCode</td>
+                    <td>@RecItem.Name</td>
+                    <td>@RecItem.Description</td>
+                    <td>
+                        <input type="button" class="btn btn-primary" value="問答"
+                               @onclick="()=>GotoQA(RecItem)" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <QuestionAnswerData currentCourse="CourseOfQuestionAnswer"
+                        goBackToCourseListDelegate="GotoList"
+                        IsAdmin="IsAdmin"/>
+}
 
 @code {
-    PagedResult<Course> pagedResult;
+    PagedResult<Course> pagedResult = new PagedResult<Course>();
     int currentPage = 1;
     int pageSize = 5;
 
     List<Course> courseUsers = new List<Course>();
     Course currentRecord;
     CourseRecordModel courseRecordModel;
+
+    bool showQuestionAnswer = false;
+    Course CourseOfQuestionAnswer;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    int CourseUserId;
+    ClaimsPrincipal claimsPrincipal;
+    bool IsAdmin = false;
+
     protected override async Task OnInitializedAsync()
     {
+        var authState = await authenticationStateTask;
+        claimsPrincipal = authState.User;
+        CourseUserId = UserIdentity.GetNameIdentity(claimsPrincipal);
+        if(        claimsPrincipal.HasClaim(x=>x.Value==GlobalHelper.AdminRoleName))
+        {
+            IsAdmin = true;
+        }
         await Reload();
     }
 
     async Task Reload()
     {
-        //courseUsers = await CourseUserService.RetriveAsync();
-        pagedResult = await CourseService.GetPagedAsync(currentPage, pageSize);
+        pagedResult = await CourseService.GetPagedByUserAsync(CourseUserId, currentPage, pageSize);
         courseUsers = pagedResult.Results.ToList();
     }
     async void PagerPageChanged(int page)
@@ -65,6 +93,12 @@
 
     void GotoQA(Course courseUser)
     {
-        NavigationManager.NavigateTo($"counter");
+        showQuestionAnswer = true;
+        CourseOfQuestionAnswer = courseUser;
+    }
+    void GotoList()
+    {
+        showQuestionAnswer = false;
+        StateHasChanged();
     }
 }

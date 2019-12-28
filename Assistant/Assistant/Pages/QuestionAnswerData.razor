@@ -1,0 +1,249 @@
+﻿@inject IQuestionAnswerService QuestionAnswerService
+@inject IModalService Modal
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+
+<h3>@currentCourse?.CourseCode 課程問答</h3>
+
+<div style="height:40px;">
+    <input type="button" class="btn btn-warning float-left" value="回課程清單"
+           @onclick="GoBack" />
+</div>
+<br />
+<div style="display:block;width:100%;">
+    <div class="float-left">
+        <input type="button" class="btn btn-primary" value="新增"
+               @onclick="Add" />
+    </div>
+    <div class="float-right">
+        <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>已回覆</th>
+            <th>問題主題</th>
+            <th>問題說明</th>
+            <th>建立時間</th>
+            <th>功能</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var RecItem in questionAnswer)
+        {
+            <tr>
+                <td>
+                    @if (RecItem.HasAnswer == true)
+                    {
+                        <span class="oi oi-check text-primary"></span>
+                    }
+                    else
+                    {
+                        <span class="oi oi-question-mark text-danger"></span>
+                    }
+                </td>
+                <td>@RecItem.QuestionTitle</td>
+                <td>@RecItem.QuestionDescription</td>
+                <td>@RecItem.Created</td>
+                <td>
+                    <input type="button" class="btn btn-primary" value="修改"
+                           @onclick="()=>Update(RecItem)" />
+                    @if (IsAdmin)
+                    {
+                        <input type="button" class="btn btn-info" value="回覆"
+                               @onclick="() => Answer(RecItem)" />
+                    }
+                    <input type="button" class="btn btn-danger" value="刪除"
+                           @onclick="()=>Delete(RecItem)" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    PagedResult<QuestionAnswer> pagedResult = new PagedResult<QuestionAnswer>();
+    int currentPage = 1;
+    int pageSize = 5;
+
+    List<QuestionAnswer> questionAnswer = new List<QuestionAnswer>();
+    QuestionAnswer currentRecord;
+    QuestionAnswerRecordModel questionAnswerRecordModel;
+
+    [Parameter]
+    public Course currentCourse { get; set; }
+    [Parameter]
+    public Action goBackToCourseListDelegate { get; set; }
+    [Parameter]
+    public bool IsAdmin { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await Reload();
+    }
+
+    async Task Reload()
+    {
+        //courseUsers = await CourseUserService.RetriveAsync();
+        pagedResult = await QuestionAnswerService.GetPagedAsync(currentCourse, currentPage, pageSize);
+        questionAnswer = pagedResult.Results.ToList();
+    }
+    async void PagerPageChanged(int page)
+    {
+        currentPage = page;
+        await Reload();
+        StateHasChanged();
+    }
+
+    void Add()
+    {
+
+        questionAnswerRecordModel = new QuestionAnswerRecordModel()
+        {
+            Id = 0,
+            QuestionTitle = "",
+            QuestionDescription = "",
+            Answer = "",
+            HasAnswer = false,
+            Closed = null,
+            Created = DateTime.Now,
+        };
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordItem", questionAnswerRecordModel);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        Modal.OnClose += OnUpdateModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<QuestionItem>("新增紀錄", parameters);
+    }
+
+    void Update(QuestionAnswer courseUser)
+    {
+        currentRecord = courseUser;
+        questionAnswerRecordModel = new QuestionAnswerRecordModel()
+        {
+            Id = currentRecord.Id,
+            QuestionTitle = currentRecord.QuestionTitle,
+            QuestionDescription = currentRecord.QuestionDescription,
+            Answer = currentRecord.Answer,
+            HasAnswer = currentRecord.HasAnswer,
+            Closed = currentRecord.Closed,
+            Created = currentRecord.Created,
+        };
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordItem", questionAnswerRecordModel);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        Modal.OnClose += OnUpdateModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<QuestionItem>("修改紀錄", parameters);
+    }
+    void Answer(QuestionAnswer courseUser)
+    {
+        currentRecord = courseUser;
+        questionAnswerRecordModel = new QuestionAnswerRecordModel()
+        {
+            Id = currentRecord.Id,
+            QuestionTitle = currentRecord.QuestionTitle,
+            QuestionDescription = currentRecord.QuestionDescription,
+            Answer = currentRecord.Answer,
+            HasAnswer = currentRecord.HasAnswer,
+            Closed = currentRecord.Closed,
+            Created = currentRecord.Created,
+        };
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordItem", questionAnswerRecordModel);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        Modal.OnClose += OnUpdateModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<AnswerItem>("回答問題", parameters);
+    }
+    // 修改紀錄對話窗的事件被觸發所要執行的委派方法
+    async void OnUpdateModalClosed(ModalResult modalResult)
+    {
+        //解除該對話窗所綁定的事件
+        Modal.OnClose -= OnUpdateModalClosed;
+        // 檢查使用者是否有點選確認按鈕
+        if (modalResult.Cancelled)
+        {
+            toastService.ShowInfo("取消修改紀錄", "通知");
+        }
+        else
+        {
+            // 若使用者點選了確定按鈕
+            if (questionAnswerRecordModel.Id == 0)
+            {
+                QuestionAnswer courseUser = new QuestionAnswer()
+                {
+                    QuestionTitle = questionAnswerRecordModel.QuestionTitle,
+                    QuestionDescription = questionAnswerRecordModel.QuestionDescription,
+                    Answer = "",
+                    HasAnswer = false,
+                    Closed = null,
+                    Created = DateTime.Now,
+                    Course = currentCourse,
+                };
+                await QuestionAnswerService.CreateAsync(courseUser);
+                toastService.ShowSuccess("紀錄已經新增", "通知");
+            }
+            else
+            {
+                currentRecord.QuestionTitle = questionAnswerRecordModel.QuestionTitle;
+                currentRecord.QuestionDescription = questionAnswerRecordModel.QuestionDescription;
+                currentRecord.Closed = questionAnswerRecordModel.Closed;
+                currentRecord.HasAnswer = questionAnswerRecordModel.HasAnswer;
+                currentRecord.Answer = questionAnswerRecordModel.Answer;
+                await QuestionAnswerService.UpdateAsync(currentRecord.Id, currentRecord);
+                toastService.ShowSuccess("紀錄已經更新", "通知");
+            }
+            await Reload();
+            toastService.ShowInfo("重新更新資料", "通知");
+            StateHasChanged();
+        }
+    }
+    void Delete(QuestionAnswer course)
+    {
+        currentRecord = course;
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordTitleName", course.QuestionTitle);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        Modal.OnClose += OnDeleteModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<ConfirmDelete>("刪除警告", parameters);
+    }
+    // 刪除對話窗的事件被觸發所要執行的委派方法
+    async void OnDeleteModalClosed(ModalResult modalResult)
+    {
+        //解除該對話窗所綁定的事件
+        Modal.OnClose -= OnDeleteModalClosed;
+        // 檢查使用者是否有點選確認按鈕
+        if (modalResult.Cancelled)
+        {
+            toastService.ShowInfo("取消刪除", "通知");
+        }
+        else
+        {
+            // 若使用者點選了確定按鈕
+            await QuestionAnswerService.DeleteAsync(currentRecord.Id);
+            toastService.ShowSuccess("紀錄已經刪除", "通知");
+            await Reload();
+            StateHasChanged();
+        }
+    }
+
+    void GoBack()
+    {
+        goBackToCourseListDelegate?.Invoke();
+    }
+}

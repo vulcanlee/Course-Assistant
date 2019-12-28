@@ -1,5 +1,6 @@
 ﻿using Assistant.DataModels;
 using Assistant.Extensions;
+using Assistant.Helpers;
 using Assistant.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,7 +18,24 @@ namespace Assistant.Services
         {
             this.myDbContext = myDbContext;
         }
+        public async Task<CourseUser> LoginAsync(string account, string password)
+        {
+            CourseUser user = await myDbContext.CourseUsers.FirstOrDefaultAsync(x => x.Account == account);
+            if (user != null)
+            {
+                string passwordHash = PasswordHelper.GetPassowrdHash(user.Salt, password);
+                if(user.PasswordHash!= passwordHash)
+                {
+                    user = null;
+                }
+            }
+            else
+            {
+                user = null;
+            }
 
+            return user;
+        }
         public async Task<List<CourseUser>> RetriveAsync()
         {
             return await myDbContext.CourseUsers.OrderBy(x=>x.OrderCode).ThenByDescending(x=>x.Created).ToListAsync();
@@ -29,7 +47,9 @@ namespace Assistant.Services
 
         public async Task<PagedResult<CourseUser>> GetPagedAsync(int page, int pageSize)
         {
-            return await myDbContext.CourseUsers.OrderBy(x => x.OrderCode).ThenByDescending(x => x.Created).GetPaged(page, pageSize);
+            var bar = await  myDbContext.CourseUsers.CountAsync();
+            var foo = await myDbContext.CourseUsers.OrderByDescending(x => x.OrderCode).ThenByDescending(x => x.Created).CountAsync();
+            return await myDbContext.CourseUsers.OrderByDescending(x => x.OrderCode).ThenByDescending(x => x.Created).GetPaged(page, pageSize);
         }
         public async Task CreateAsync(CourseUser courseUser)
         {

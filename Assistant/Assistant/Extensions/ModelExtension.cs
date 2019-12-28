@@ -21,6 +21,17 @@ namespace Assistant.Extensions
             newCourseUser.Name = courseUser.Name;
             return newCourseUser;
         }
+        public static CourseCourseUser Clone(this CourseCourseUser courseUser)
+        {
+            CourseCourseUser newCourseUser = new CourseCourseUser()
+            {
+                Course = courseUser.Course.Clone(),
+                CourseUser = courseUser.CourseUser.Clone(),
+                CourseUserId = courseUser.CourseUserId,
+                CourseId = courseUser.CourseId,
+            };
+            return newCourseUser;
+        }
         public static Course Clone(this Course courseUser)
         {
             Course newCourseUser = new Course()
@@ -29,13 +40,13 @@ namespace Assistant.Extensions
                 Name = courseUser.Name,
                 CourseCode = courseUser.CourseCode,
                 Description = courseUser.Description,
-                CourseUsers = new List<CourseUser>()
+                CourseCourseUsers = new List<CourseCourseUser>()
             };
 
-            foreach (var item in courseUser.CourseUsers)
+            foreach (var item in courseUser.CourseCourseUsers)
             {
                 var user = item.Clone();
-                newCourseUser.CourseUsers.Add(user);
+                newCourseUser.CourseCourseUsers.Add(user);
             }
             return newCourseUser;
         }

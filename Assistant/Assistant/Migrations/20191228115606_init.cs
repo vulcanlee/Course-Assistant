@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Assistant.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +12,7 @@ namespace Assistant.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CourseCode = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
@@ -28,7 +28,7 @@ namespace Assistant.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Account = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Salt = table.Column<Guid>(nullable: false),
@@ -36,18 +36,11 @@ namespace Assistant.Migrations
                     Roles = table.Column<string>(nullable: true),
                     IsAdmin = table.Column<bool>(nullable: false),
                     Created = table.Column<DateTime>(nullable: false),
-                    OrderCode = table.Column<int>(nullable: false),
-                    CourseId = table.Column<int>(nullable: true)
+                    OrderCode = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CourseUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CourseUsers_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -55,7 +48,7 @@ namespace Assistant.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     QuestionTitle = table.Column<string>(nullable: false),
                     QuestionDescription = table.Column<string>(nullable: true),
                     Answer = table.Column<string>(nullable: true),
@@ -75,9 +68,33 @@ namespace Assistant.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CourseCourseUser",
+                columns: table => new
+                {
+                    CourseUserId = table.Column<int>(nullable: false),
+                    CourseId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseCourseUser", x => new { x.CourseUserId, x.CourseId });
+                    table.ForeignKey(
+                        name: "FK_CourseCourseUser_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseCourseUser_CourseUsers_CourseUserId",
+                        column: x => x.CourseUserId,
+                        principalTable: "CourseUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_CourseUsers_CourseId",
-                table: "CourseUsers",
+                name: "IX_CourseCourseUser_CourseId",
+                table: "CourseCourseUser",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
@@ -89,10 +106,13 @@ namespace Assistant.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CourseUsers");
+                name: "CourseCourseUser");
 
             migrationBuilder.DropTable(
                 name: "QuestionAnswers");
+
+            migrationBuilder.DropTable(
+                name: "CourseUsers");
 
             migrationBuilder.DropTable(
                 name: "Courses");

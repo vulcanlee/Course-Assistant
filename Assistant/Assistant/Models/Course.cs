@@ -15,6 +15,6 @@ namespace Assistant.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime Created { get; set; }
-        public List<CourseUser> CourseUsers { get; set; }
+        public List<CourseCourseUser> CourseCourseUsers { get; set; }
     }
 }

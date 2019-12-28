@@ -17,5 +17,21 @@ namespace Assistant.Models
         public DbSet<CourseUser> CourseUsers { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<QuestionAnswer> QuestionAnswers { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CourseCourseUser>()
+                        .HasKey(t => new { t.CourseUserId, t.CourseId });
+
+            modelBuilder.Entity<CourseCourseUser>()
+                .HasOne(pt => pt.Course)
+                .WithMany(p => p.CourseCourseUsers)
+                .HasForeignKey(pt => pt.CourseId);
+
+            modelBuilder.Entity<CourseCourseUser>()
+                .HasOne(pt => pt.CourseUser)
+                .WithMany(t => t.CourseCourseUsers)
+                .HasForeignKey(pt => pt.CourseUserId);
+        }
     }
 }

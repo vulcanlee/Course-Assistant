@@ -1,4 +1,5 @@
-﻿using Assistant.Services;
+﻿using Assistant.Helpers;
+using Assistant.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace Assistant.Extensions
         {
             services.AddScoped<ICourseUserService, CourseUserService>();
             services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<IQuestionAnswerService, QuestionAnswerService>();
+            services.AddScoped<UserIdentity>();
         }
     }
 }

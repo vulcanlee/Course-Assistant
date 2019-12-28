@@ -9,6 +9,8 @@ namespace Assistant.Services
 {
     public interface ICourseUserService : IStandardService<CourseUser>
     {
+        Task<CourseUser> LoginAsync(string account, string password);
+        Task<CourseUser> RetriveAsync(int id);
         //Task CreateAsync(CourseUser courseUser);
         //Task DeleteAsync(int id);
         //Task<List<CourseUser>> RetriveAsync();

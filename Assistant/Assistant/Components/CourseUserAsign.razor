@@ -1,5 +1,6 @@
 ﻿@inject IModalService ModalService
 @inject ICourseUserService CourseUserService
+@inject ICourseService CourseService
 @inject IToastService toastService
 
 <div style="width:700px;">
@@ -49,7 +50,7 @@
 
     Course RecordItem { get; set; }
 
-    PagedResult<CourseUser> pagedResult;
+    PagedResult<CourseUser> pagedResult = new PagedResult<CourseUser>();
     int currentPage = 1;
     int pageSize = 5;
     List<CourseUser> chooseCourseUsers = new List<CourseUser>();
@@ -60,20 +61,29 @@
         // 透過傳遞來的參數，取得當前記事的名稱
         RecordItem = Parameters.Get<Course>("RecordItem");
         chooseCourseUsers.Clear();
-        foreach (var item in RecordItem.CourseUsers)
+        foreach (var item in RecordItem.CourseCourseUsers)
         {
-            chooseCourseUsers.Add(item);
+            var foo = await CourseUserService.RetriveAsync(item.CourseUserId);
+            chooseCourseUsers.Add(foo);
         }
         await Reload();
+        StateHasChanged();
+
     }
 
     void SubmitForm()
     {
         //使用者確定要刪除，回應 ModalResult.Ok
-        RecordItem.CourseUsers.Clear();
+        RecordItem.CourseCourseUsers.Clear();
         foreach (var item in chooseCourseUsers)
         {
-            RecordItem.CourseUsers.Add(item);
+            RecordItem.CourseCourseUsers.Add(new CourseCourseUser()
+            {
+                Course = RecordItem,
+                CourseId = RecordItem.Id,
+                CourseUser = item,
+                CourseUserId = item.Id,
+            });
         }
         ModalService.Close(ModalResult.Ok($""));
     }
