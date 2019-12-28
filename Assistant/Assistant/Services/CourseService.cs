@@ -20,7 +20,7 @@ namespace Assistant.Services
 
         public async Task<List<Course>> RetriveAsync()
         {
-            return await myDbContext.Courses.Include(x=>x.CourseUsers).ToListAsync();
+            return await myDbContext.Courses.OrderByDescending(x=>x.Created).Include(x=>x.CourseUsers).ToListAsync();
         }
         public async Task<Course> RetriveAsync(int id)
         {
@@ -28,7 +28,7 @@ namespace Assistant.Services
         }
         public async Task<PagedResult<Course>> GetPagedAsync(int page, int pageSize)
         {
-            return await myDbContext.Courses.Include(x => x.CourseUsers).GetPaged(page, pageSize);
+            return await myDbContext.Courses.OrderByDescending(x => x.Created).Include(x => x.CourseUsers).GetPaged(page, pageSize);
         }
         public async Task CreateAsync(Course courseUser)
         {

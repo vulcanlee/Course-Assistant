@@ -2,46 +2,44 @@
 @inject ICourseUserService CourseUserService
 @inject IToastService toastService
 
-<div class="row">
-    <div class="col-9">
-        <div class="row p-2">
-            <div class="float-right">
-                <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
-            </div>
+<div style="width:700px;">
+    <div class="p-2">
+        <div class="float-right">
+            <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
+        </div>
 
-            <table class="table">
-                <thead>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>功能</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var RecItem in courseUsers)
+                {
                     <tr>
-                        <th>姓名</th>
-                        <th>功能</th>
+                        <td>@RecItem.Name</td>
+                        <td>
+                            @if (AddOrRemoveTitle(RecItem) == "加入")
+                            {
+                                <input type="button" class="btn btn-primary" value="加入"
+                                       @onclick="() => DoAddOrRemove(RecItem)" />
+                            }
+                            else
+                            {
+                                <input type="button" class="btn btn-danger" value="移除"
+                                       @onclick="() => DoAddOrRemove(RecItem)" />
+                            }
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var RecItem in courseUsers)
-                    {
-                        <tr>
-                            <td>@RecItem.Name</td>
-                            <td>
-                                @if (AddOrRemoveTitle(RecItem) == "加入")
-                                {
-                                    <input type="button" class="btn btn-primary" value="加入"
-                                           @onclick="() => DoAddOrRemove(RecItem)" />
-                                }
-                                else
-                                {
-                                    <input type="button" class="btn btn-danger" value="移除"
-                                           @onclick="() => DoAddOrRemove(RecItem)" />
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                }
+            </tbody>
+        </table>
 
-            <div>
-                <button @onclick="SubmitForm" class="btn btn-primary">確定</button>
-                <button @onclick="Cancel" class="btn btn-secondary">取消</button>
-            </div>
+        <div>
+            <button @onclick="SubmitForm" class="btn btn-primary">確定</button>
+            <button @onclick="Cancel" class="btn btn-secondary">取消</button>
         </div>
     </div>
 </div>

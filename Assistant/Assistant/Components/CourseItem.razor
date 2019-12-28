@@ -1,26 +1,24 @@
 ﻿@inject IModalService ModalService
 
-<div class="row">
-    <div class="col-9">
-        <div class="row p-2">
-            <EditForm Model="@RecordItem" OnValidSubmit="@HandleValidSubmit">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="form-group">
-                    <label for="name">課程代碼</label>
-                    <InputText id="name" class="form-control" @bind-Value="@RecordItem.CourseCode" />
-                </div>
-                <div class="form-group">
-                    <label for="name">名稱</label>
-                    <InputText id="name" class="form-control" @bind-Value="@RecordItem.Name" />
-                </div>
-                <div class="form-group">
-                    <label for="name">說明</label>
-                    <InputText id="name" class="form-control" @bind-Value="@RecordItem.Description" />
-                </div>
-                <button type="submit" class="btn btn-primary">儲存</button>
-            </EditForm>
-        </div>
+<div style="width:700px;">
+    <div class="p-2">
+        <EditForm Model="@RecordItem" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="name">課程代碼</label>
+                <InputText id="name" class="form-control" @bind-Value="@RecordItem.CourseCode" />
+            </div>
+            <div class="form-group">
+                <label for="name">名稱</label>
+                <InputText id="name" class="form-control" @bind-Value="@RecordItem.Name" />
+            </div>
+            <div class="form-group">
+                <label for="name">說明</label>
+                <InputText id="name" class="form-control" @bind-Value="@RecordItem.Description" />
+            </div>
+            <button type="submit" class="btn btn-primary">儲存</button>
+        </EditForm>
     </div>
 </div>
 
