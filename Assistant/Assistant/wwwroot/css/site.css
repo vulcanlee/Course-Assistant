@@ -182,3 +182,6 @@ app {
     }
 }
 
+.blazored-modal {
+    width: 50rem !important;
+}

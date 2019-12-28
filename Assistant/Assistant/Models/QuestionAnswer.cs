@@ -15,6 +15,7 @@ namespace Assistant.Models
         public string Answer { get; set; }
         public bool HasAnswer { get; set; }
         public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
         public DateTime? Closed { get; set; }
         public Course Course { get; set; }
     }

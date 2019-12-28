@@ -5,17 +5,16 @@
 
 <h3>@currentCourse?.CourseCode 課程問答</h3>
 
-<div style="height:40px;">
-    <input type="button" class="btn btn-warning float-left" value="回課程清單"
+<div class="my-2" >
+    <input type="button" class="btn btn-warning" value="回課程清單"
            @onclick="GoBack" />
 </div>
-<br />
-<div style="display:block;width:100%;">
-    <div class="float-left">
+<div class="d-flex justify-content-between">
+    <div>
         <input type="button" class="btn btn-primary" value="新增"
                @onclick="Add" />
     </div>
-    <div class="float-right">
+    <div>
         <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
     </div>
 </div>
