@@ -41,7 +41,7 @@ namespace Assistant
             services.AddDbContext<MyDbContext>(options =>
             {
                 //options.UseSqlite("Data Source=CourseAssistant.db");
-                options.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=CourseAssistant; Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
             services.AddCourseAssistantService();

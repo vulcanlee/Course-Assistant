@@ -130,6 +130,7 @@
                     Name = courseRecordModel.Name,
                     CourseCode = courseRecordModel.CourseCode,
                     Description = courseRecordModel.Description,
+                    Created = DateTime.Now
                 };
                 await CourseService.CreateAsync(courseUser);
                 toastService.ShowSuccess("紀錄已經新增", "通知");
