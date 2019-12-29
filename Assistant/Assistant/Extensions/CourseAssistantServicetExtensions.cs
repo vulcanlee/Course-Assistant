@@ -16,6 +16,7 @@ namespace Assistant.Extensions
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IQuestionAnswerService, QuestionAnswerService>();
             services.AddScoped<UserIdentity>();
+            services.AddSingleton<QuestionBroadcast>();
         }
     }
 }

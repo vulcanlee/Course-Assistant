@@ -1,4 +1,9 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@inject QuestionBroadcast QuestionBroadcast
+@implements IDisposable
+@inject IToastService toastService
+
+
+<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">Assistant</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -51,5 +56,19 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override void OnInitialized()
+    {
+        QuestionBroadcast.Unsubscribe(ShowNotification);
+        QuestionBroadcast.Subscribe(ShowNotification);
+    }
+    void ShowNotification(string msg)
+    {
+        toastService.ShowWarning(msg, "有新問題提出了");
+    }
+    public void Dispose()
+    {
+        QuestionBroadcast.Unsubscribe(ShowNotification);
     }
 }

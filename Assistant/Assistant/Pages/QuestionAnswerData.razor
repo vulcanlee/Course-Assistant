@@ -2,6 +2,7 @@
 @inject IModalService Modal
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
+@inject QuestionBroadcast QuestionBroadcast
 
 <h3>@currentCourse?.CourseCode 課程問答</h3>
 
@@ -47,7 +48,7 @@
                     @if (RecItem.HasAnswer == true)
                     {
                         <div>
-                            <span class="oi oi-bullhorn mr-3 btn btn-outline-success"  @onclick="()=>QueryAnswer(RecItem)" />
+                            <span class="oi oi-bullhorn mr-3 btn btn-outline-success" @onclick="()=>QueryAnswer(RecItem)" />
                             @RecItem.QuestionTitle
                         </div>
                     }
@@ -228,6 +229,7 @@
                 };
                 await QuestionAnswerService.CreateAsync(courseUser);
                 toastService.ShowSuccess("紀錄已經新增", "通知");
+                await QuestionBroadcast.Publish(courseUser.QuestionTitle);
             }
             else
             {
