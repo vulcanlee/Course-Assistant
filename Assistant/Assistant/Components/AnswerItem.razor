@@ -1,29 +1,66 @@
 ﻿@inject IModalService ModalService
 
-<div >
+<div>
     <div class="p-2">
         <EditForm Model="@RecordItem" OnValidSubmit="@HandleValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="form-group">
                 <label for="QuestionTitle">問題主題</label>
-                <InputText id="QuestionTitle" class="form-control" @bind-Value="@RecordItem.QuestionTitle" />
+                @if (QueryAnswerAction == false)
+                {
+                    <InputText id="QuestionTitle" class="form-control" @bind-Value="@RecordItem.QuestionTitle" />
+                }
+                else
+                {
+                    <div>@RecordItem.QuestionTitle</div>
+                }
             </div>
             <div class="form-group">
                 <label for="QuestionDescription">問題說明</label>
-                <InputTextArea id="QuestionDescription" class="form-control" @bind-Value="@RecordItem.QuestionDescription" />
+                @if (QueryAnswerAction == false)
+                {
+                    <InputTextArea id="QuestionDescription" class="form-control" @bind-Value="@RecordItem.QuestionDescription" />
+                }
+                else
+                {
+                    <p style="white-space: pre-line">@RecordItem.QuestionDescription</p>
+                    @*<div>@RecordItem.QuestionDescription</div>*@
+                }
             </div>
             <div class="form-group">
                 <label for="Answer">問題回覆</label>
-                <InputTextArea id="Answer" class="form-control" @bind-Value="@RecordItem.Answer" />
+                @if (QueryAnswerAction == false)
+                {
+                    <InputTextArea id="Answer" class="form-control" @bind-Value="@RecordItem.Answer" />
+                }
+                else
+                {
+                    <p style="white-space: pre-line">@RecordItem.Answer</p>
+                    @*<div>@RecordItem.Answer</div>*@
+                }
             </div>
             <div class="form-group ">
                 <label for="HasAnswer">已回覆</label>
-                <div>
-                    <InputCheckbox id="HasAnswer" @bind-Value="@RecordItem.HasAnswer" />
-                </div>
+                @if (QueryAnswerAction == false)
+                {
+                    <div>
+                        <InputCheckbox id="HasAnswer" @bind-Value="@RecordItem.HasAnswer" />
+                    </div>
+                }
+                else
+                {
+                    <div>@HasAnswerText</div>
+                }
             </div>
-            <button type="submit" class="btn btn-primary">儲存</button>
+            @if (QueryAnswerAction == false)
+            {
+                <button type="submit" class="btn btn-primary">儲存</button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-primary">關閉</button>
+            }
         </EditForm>
     </div>
 </div>
@@ -33,11 +70,15 @@
 
     // 這筆記事的名稱
     QuestionAnswerRecordModel RecordItem { get; set; }
+    public bool QueryAnswerAction { get; set; }
+    public string HasAnswerText { get; set; }
 
     protected override void OnInitialized()
     {
         // 透過傳遞來的參數，取得當前記事的名稱
         RecordItem = Parameters.Get<QuestionAnswerRecordModel>("RecordItem");
+        QueryAnswerAction = Parameters.Get<bool>("QueryAnswerAction");
+        if (RecordItem.HasAnswer == true) HasAnswerText = "是"; else HasAnswerText = "否";
     }
 
     void HandleValidSubmit()

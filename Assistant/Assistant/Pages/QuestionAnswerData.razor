@@ -5,7 +5,7 @@
 
 <h3>@currentCourse?.CourseCode 課程問答</h3>
 
-<div class="my-2" >
+<div class="my-2">
     <input type="button" class="btn btn-warning" value="回課程清單"
            @onclick="GoBack" />
 </div>
@@ -43,7 +43,19 @@
                         <span class="oi oi-question-mark text-danger"></span>
                     }
                 </td>
-                <td>@RecItem.QuestionTitle</td>
+                <td>
+                    @if (RecItem.HasAnswer == true)
+                    {
+                        <div>
+                            <span class="oi oi-bullhorn mr-3 btn btn-outline-success"  @onclick="()=>QueryAnswer(RecItem)" />
+                            @RecItem.QuestionTitle
+                        </div>
+                    }
+                    else
+                    {
+                        @RecItem.QuestionTitle
+                    }
+                </td>
                 <td>@RecItem.QuestionDescription</td>
                 <td>@RecItem.Created</td>
                 <td>
@@ -121,7 +133,6 @@
         // 顯示這個刪除對話窗
         Modal.Show<QuestionItem>("新增紀錄", parameters);
     }
-
     void Update(QuestionAnswer courseUser)
     {
         currentRecord = courseUser;
@@ -160,11 +171,35 @@
         var parameters = new ModalParameters();
         // 宣告要傳遞給刪除對話窗的參數
         parameters.Add("RecordItem", questionAnswerRecordModel);
+        parameters.Add("QueryAnswerAction", false);
 
         // 綁定使用者關閉對話窗的觸發事件
         Modal.OnClose += OnUpdateModalClosed;
         // 顯示這個刪除對話窗
         Modal.Show<AnswerItem>("回答問題", parameters);
+    }
+    void QueryAnswer(QuestionAnswer courseUser)
+    {
+        currentRecord = courseUser;
+        questionAnswerRecordModel = new QuestionAnswerRecordModel()
+        {
+            Id = currentRecord.Id,
+            QuestionTitle = currentRecord.QuestionTitle,
+            QuestionDescription = currentRecord.QuestionDescription,
+            Answer = currentRecord.Answer,
+            HasAnswer = currentRecord.HasAnswer,
+            Closed = currentRecord.Closed,
+            Created = currentRecord.Created,
+        };
+        var parameters = new ModalParameters();
+        // 宣告要傳遞給刪除對話窗的參數
+        parameters.Add("RecordItem", questionAnswerRecordModel);
+        parameters.Add("QueryAnswerAction", true);
+
+        // 綁定使用者關閉對話窗的觸發事件
+        //Modal.OnClose += OnUpdateModalClosed;
+        // 顯示這個刪除對話窗
+        Modal.Show<AnswerItem>("查看問題回覆", parameters);
     }
     // 修改紀錄對話窗的事件被觸發所要執行的委派方法
     async void OnUpdateModalClosed(ModalResult modalResult)
