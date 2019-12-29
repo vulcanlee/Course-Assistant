@@ -78,6 +78,7 @@ namespace Assistant.Services
                 fooItem.Salt = courseUser.Salt;
                 fooItem.Account = courseUser.Account;
                 fooItem.IsAdmin = courseUser.IsAdmin;
+                fooItem.IsOnlyAddQuestion = courseUser.IsOnlyAddQuestion;
                 fooItem.OrderCode = courseUser.OrderCode;
                 fooItem.Created = courseUser.Created;
                 await myDbContext.SaveChangesAsync();

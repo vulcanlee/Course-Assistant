@@ -80,6 +80,7 @@
             Roles = "",
             Account = "",
             IsAdmin = false,
+            IsOnlyAddQuestion = false,
             OrderCode = 0
         };
         var parameters = new ModalParameters();
@@ -103,6 +104,7 @@
             Roles = currentCourseUser.Roles,
             Account = currentCourseUser.Account,
             IsAdmin = currentCourseUser.IsAdmin,
+             IsOnlyAddQuestion = currentCourseUser.IsOnlyAddQuestion,
             OrderCode = currentCourseUser.OrderCode,
         };
         var parameters = new ModalParameters();
@@ -137,6 +139,7 @@
                     Account = courseUserRecordModel.Account,
                     Created = DateTime.Now,
                     IsAdmin = courseUserRecordModel.IsAdmin,
+                    IsOnlyAddQuestion = courseUserRecordModel.IsOnlyAddQuestion,
                     OrderCode = courseUserRecordModel.OrderCode,
                     Salt = guid,
                     PasswordHash = PasswordHelper.GetPassowrdHash(guid, courseUserRecordModel.Password)
@@ -150,6 +153,7 @@
                 currentCourseUser.Roles = courseUserRecordModel.Roles;
                 currentCourseUser.Account = courseUserRecordModel.Account;
                 currentCourseUser.IsAdmin = courseUserRecordModel.IsAdmin;
+                currentCourseUser.IsOnlyAddQuestion = courseUserRecordModel.IsOnlyAddQuestion;
                 currentCourseUser.OrderCode = courseUserRecordModel.OrderCode;
 
                 if (string.IsNullOrEmpty(courseUserRecordModel.Password) == false)

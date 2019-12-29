@@ -28,6 +28,12 @@
                 </div>
             </div>
             <div class="form-group ">
+                <label for="IsOnlyAddQuestion">僅可提交問題</label>
+                <div>
+                    <InputCheckbox id="IsOnlyAddQuestion" @bind-Value="@RecordItem.IsOnlyAddQuestion" />
+                </div>
+            </div>
+            <div class="form-group ">
                 <label for="Password">密碼</label>
                 <InputText id="Password" type="password" class="form-control" @bind-Value="@RecordItem.Password" />
             </div>

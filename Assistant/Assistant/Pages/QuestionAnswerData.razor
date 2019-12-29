@@ -16,6 +16,10 @@
                @onclick="Add" />
     </div>
     <div>
+        <input type="button" class="btn btn-secondary" value="重新整理"
+               @onclick="Refresh" />
+    </div>
+    <div>
         <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
     </div>
 </div>
@@ -60,15 +64,21 @@
                 <td>@RecItem.QuestionDescription</td>
                 <td>@RecItem.Created</td>
                 <td>
-                    <input type="button" class="btn btn-primary" value="修改"
-                           @onclick="()=>Update(RecItem)" />
+                    @if (IsOnlyAddQuestion == false)
+                    {
+                        <input type="button" class="btn btn-primary" value="修改"
+                               @onclick="()=>Update(RecItem)" />
+                    }
                     @if (IsAdmin)
                     {
                         <input type="button" class="btn btn-info" value="回覆"
                                @onclick="() => Answer(RecItem)" />
                     }
-                    <input type="button" class="btn btn-danger" value="刪除"
-                           @onclick="()=>Delete(RecItem)" />
+                    @if (IsOnlyAddQuestion == false)
+                    {
+                        <input type="button" class="btn btn-danger" value="刪除"
+                               @onclick="()=>Delete(RecItem)" />
+                    }
                 </td>
             </tr>
         }
@@ -90,6 +100,8 @@
     public Action goBackToCourseListDelegate { get; set; }
     [Parameter]
     public bool IsAdmin { get; set; }
+    [Parameter]
+    public bool IsOnlyAddQuestion { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -111,7 +123,11 @@
         await Reload();
         StateHasChanged();
     }
-
+    async void Refresh()
+    {
+        await Reload();
+        StateHasChanged();
+    }
     void Add()
     {
 

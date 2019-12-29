@@ -1,5 +1,6 @@
 ﻿@page "/CoursesList"
 @inject ICourseService CourseService
+@inject ICourseUserService CourseUserService
 @inject IModalService Modal
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
@@ -46,7 +47,7 @@ else
 {
     <QuestionAnswerData currentCourse="CourseOfQuestionAnswer"
                         goBackToCourseListDelegate="GotoList"
-                        IsAdmin="IsAdmin"/>
+                        IsAdmin="IsAdmin" IsOnlyAddQuestion="IsOnlyAddQuestion" />
 }
 
 @code {
@@ -66,15 +67,21 @@ else
     int CourseUserId;
     ClaimsPrincipal claimsPrincipal;
     bool IsAdmin = false;
+    bool IsOnlyAddQuestion = true;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationStateTask;
         claimsPrincipal = authState.User;
         CourseUserId = UserIdentity.GetNameIdentity(claimsPrincipal);
-        if(        claimsPrincipal.HasClaim(x=>x.Value==GlobalHelper.AdminRoleName))
+        var user = await CourseUserService.RetriveAsync(CourseUserId);
+        if (claimsPrincipal.HasClaim(x => x.Value == GlobalHelper.AdminRoleName))
         {
             IsAdmin = true;
+        }
+        if(user != null)
+        {
+            IsOnlyAddQuestion = user.IsOnlyAddQuestion;
         }
         await Reload();
     }

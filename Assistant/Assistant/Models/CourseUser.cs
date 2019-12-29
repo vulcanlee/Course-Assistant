@@ -17,6 +17,7 @@ namespace Assistant.Models
         public string PasswordHash { get; set; }
         public string Roles { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsOnlyAddQuestion { get; set; }
         public DateTime Created { get; set; }
         public int OrderCode { get; set; }
         public List<CourseCourseUser> CourseCourseUsers { get; set; }

@@ -16,6 +16,7 @@ namespace Assistant.DataModels
         public string Password { get; set; } = "";
         public string Roles { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsOnlyAddQuestion { get; set; }
         public int OrderCode { get; set; }
     }
 }

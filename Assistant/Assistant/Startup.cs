@@ -86,6 +86,7 @@ namespace Assistant
                 {
                     Account = "vulcan",
                     IsAdmin = true,
+                    IsOnlyAddQuestion=false,
                     Name = "Vulcan Lee",
                     PasswordHash = PasswordHelper.GetPassowrdHash(fooGuid, "123"),
                     Salt = fooGuid,
