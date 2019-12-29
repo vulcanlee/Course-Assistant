@@ -34,6 +34,10 @@ namespace Assistant.Services
             }
             return Task.FromResult(0);
         }
-
+        public Task<int> GetAllSubscriber()
+        {
+            int all = AllNewQuestionEvent.Count();
+            return Task.FromResult(all);
+        }
     }
 }

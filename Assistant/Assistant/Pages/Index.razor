@@ -1,15 +1,19 @@
 ﻿@page "/"
 @inject UserIdentity UserIdentity
+@inject QuestionBroadcast QuestionBroadcast
 
 <h1>你好</h1>
 
-<div class="text-primary display-4">
-這是一個使用 伺服器端的 Blazor Framework 所開發出來的教育訓練課程輔助應用程式，整個開發過程，僅使用 HTML / C# 來進行開發，開發過程中，完全沒有寫道任何一行 JavaScript 相關的程式碼。
+<div class="text-primary">
+    這是一個使用 伺服器端的 Blazor Framework 所開發出來的教育訓練課程輔助應用程式，整個開發過程，僅使用 HTML / C# 來進行開發，開發過程中，完全沒有寫道任何一行 JavaScript 相關的程式碼。
 </div>
 
-<div class="">
-透過這個應用程式的開發，希望能夠解除許多對 Blazor 這套開發工具的疑惑。
+<div class="text-danger">
+    透過這個應用程式的開發，希望能夠解除許多對 Blazor 這套開發工具的疑惑。
 </div>
+
+<div>現在共有 @AllMembers 在線上</div>
+<button class="btn btn-outline-info" @onclick="ShowMembers">更新線上人數</button>
 
 @*<CourseUserData/>*@
 @*<CourseData/>*@
@@ -17,6 +21,7 @@
 @code{
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    int AllMembers = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,5 +36,9 @@
         {
             Console.WriteLine("The user is NOT authenticated.");
         }
+    }
+    async void ShowMembers()
+    {
+        AllMembers = await QuestionBroadcast.GetAllSubscriber();
     }
 }
