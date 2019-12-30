@@ -53,22 +53,49 @@
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
 
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
-        QuestionBroadcast.Unsubscribe(ShowNotification);
-        QuestionBroadcast.Subscribe(ShowNotification);
+        await QuestionBroadcast.Unsubscribe(ShowNotification);
+        await QuestionBroadcast.Subscribe(ShowNotification);
+        await QuestionBroadcast.UnsubscribeConcurrentConnection(ShowConnectionNotification);
+        await QuestionBroadcast.SubscribeConcurrentConnection(ShowConnectionNotification);
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            await QuestionBroadcast.PublishConcurrentConnection();
+        }
+    }
+
     void ShowNotification(string msg)
     {
         toastService.ShowWarning(msg, "有新問題提出了");
     }
-    public void Dispose()
+    async void ShowConnectionNotification(int connections)
     {
-        QuestionBroadcast.Unsubscribe(ShowNotification);
+        var authState = await authenticationStateTask;
+        ClaimsPrincipal claimsPrincipal = authState.User;
+        if (claimsPrincipal.HasClaim(x => x.Value == GlobalHelper.AdminRoleName))
+        {
+            toastService.ShowError($"同時連線數量:{connections}", "同時連線人數回報");
+        }
     }
+    public async void Dispose()
+    {
+        await QuestionBroadcast.Unsubscribe(ShowNotification);
+        await QuestionBroadcast.PublishConcurrentConnection();
+        await QuestionBroadcast.UnsubscribeConcurrentConnection(ShowConnectionNotification);
+    }
+
+
 }
