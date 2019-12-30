@@ -93,8 +93,8 @@
     public async void Dispose()
     {
         await QuestionBroadcast.Unsubscribe(ShowNotification);
-        await QuestionBroadcast.PublishConcurrentConnection();
         await QuestionBroadcast.UnsubscribeConcurrentConnection(ShowConnectionNotification);
+        await QuestionBroadcast.PublishConcurrentConnection();
     }
 
 
