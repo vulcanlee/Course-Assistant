@@ -17,6 +17,8 @@ using Blazored.Modal;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Assistant.Helpers;
+using Assistant.Services;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 
 namespace Assistant
 {
@@ -58,6 +60,11 @@ namespace Assistant
             services.AddAuthentication(
                 CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
+            #endregion
+
+            #region 效能測試用
+            services.AddSingleton<CircuitHandler, CounterCircuitHandler>();
+            services.AddSingleton<ConnectionTracker>();
             #endregion
         }
 
