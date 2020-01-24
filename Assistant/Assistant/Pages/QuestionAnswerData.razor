@@ -6,20 +6,14 @@
 
 <h3>@currentCourse?.CourseCode 課程問答</h3>
 
-<div class="my-2">
-    <input type="button" class="btn btn-warning" value="回課程清單"
+<div class="clearfix">
+    <input type="button" class="btn btn-primary float-left" value="新增"
+           @onclick="Add" />
+    <input type="button" class="btn btn-secondary float-left ml-4" value="重新整理"
+           @onclick="Refresh" />
+    <input type="button" class="btn btn-warning float-left ml-4" value="回課程清單"
            @onclick="GoBack" />
-</div>
-<div class="d-flex justify-content-between">
-    <div>
-        <input type="button" class="btn btn-primary" value="新增"
-               @onclick="Add" />
-    </div>
-    <div>
-        <input type="button" class="btn btn-secondary" value="重新整理"
-               @onclick="Refresh" />
-    </div>
-    <div>
+    <div class="float-right">
         <Pager Result=@pagedResult PageChanged=@PagerPageChanged />
     </div>
 </div>
