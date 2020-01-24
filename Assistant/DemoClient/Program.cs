@@ -37,10 +37,11 @@ namespace DemoClient
             var tasks = new List<Task>();
             for (var i = 0; i < count; i++)
             {
+                int idx = i;
                 Console.WriteLine($"Creating client {i}...");
                 var client = new BlazorClient()
                 {
-                    DefaultOperationTimeout = TimeSpan.FromSeconds(5),
+                    DefaultOperationTimeout = TimeSpan.FromSeconds(50), 
                 };
 
                 while (true)
@@ -63,7 +64,8 @@ namespace DemoClient
                     await Task.Delay(TimeSpan.FromSeconds(5));
                 }
 
-                tasks.Add(Task.Run(() => RunAsync(uri, client, cts.Token)));
+                tasks.Add(Task.Run(() => RunAsync(idx,uri, client, cts.Token)));
+                await Task.Delay(200);
             }
 
             Console.WriteLine($"Started {count} clients.");
@@ -72,7 +74,7 @@ namespace DemoClient
             return 0;
         }
 
-        async static Task RunAsync(Uri uri, BlazorClient client, CancellationToken cancellationToken)
+        async static Task RunAsync(int idx, Uri uri, BlazorClient client, CancellationToken cancellationToken)
         {
             var counterUri = uri.AbsoluteUri + "/counter";
 
@@ -93,7 +95,7 @@ namespace DemoClient
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Client failed: " + ex);
+                    Console.WriteLine($"Client failed [[[{idx}]]]: " + ex);
                 }
             }
         }
