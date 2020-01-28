@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject UserIdentity UserIdentity
 @inject QuestionBroadcast QuestionBroadcast
+@using System.Threading
 
 <h1>你好</h1>
 
@@ -15,6 +16,16 @@
 <div>現在共有 @AllMembers 在線上</div>
 <button class="btn btn-outline-info" @onclick="ShowMembers">更新線上人數</button>
 
+<br />
+<br />
+
+<div>
+    現在執行緒 ID : @currentThread
+</div>
+<div>
+    執行緒集區的資訊為 : @threadInformation
+</div>
+
 @*<CourseUserData/>*@
 @*<CourseData/>*@
 
@@ -22,6 +33,9 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     int AllMembers = 0;
+    string currentThread = "";
+    string threadInformation = "";
+    ThreadPoolInfo threadPoolInfo = new ThreadPoolInfo();
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,5 +54,40 @@
     async void ShowMembers()
     {
         AllMembers = await QuestionBroadcast.GetAllSubscriber();
+        GetThreadInformation();
+    }
+    void GetThreadInformation()
+    {
+        threadInformation = GetThreadPoolInfo();
+        currentThread = Thread.CurrentThread.ManagedThreadId.ToString();
+    }
+    string GetThreadPoolInfo(bool breakLine = false)
+    {
+        var lineSeparate = breakLine ? Environment.NewLine : "";
+        DateTime Begin = DateTime.Now;
+        QueryThreadPoolInfo(threadPoolInfo);
+        DateTime Complete = DateTime.Now;
+        return
+            $"AW:{threadPoolInfo.WorkerThreadsAvailable} / AIOC:{threadPoolInfo.CompletionPortThreadsAvailable} " + lineSeparate +
+            $"MaxW:{threadPoolInfo.WorkerThreadsMax} / MaxIOC:{threadPoolInfo.CompletionPortThreadsMax} " + lineSeparate +
+            $"MinW:{threadPoolInfo.WorkerThreadsMin} / MinIOC:{threadPoolInfo.CompletionPortThreadsMin} " + Environment.NewLine;
+
+    }
+    void QueryThreadPoolInfo(ThreadPoolInfo threadPoolInfo)
+    {
+        ThreadPool.GetAvailableThreads(out threadPoolInfo.WorkerThreadsAvailable, out threadPoolInfo.CompletionPortThreadsAvailable);
+        ThreadPool.GetMaxThreads(out threadPoolInfo.WorkerThreadsMax, out threadPoolInfo.CompletionPortThreadsMax);
+        ThreadPool.GetMinThreads(out threadPoolInfo.WorkerThreadsMin, out threadPoolInfo.CompletionPortThreadsMin);
+        DateTime Complete = DateTime.Now;
+        return;
+    }
+    class ThreadPoolInfo
+    {
+        public int WorkerThreadsAvailable;
+        public int CompletionPortThreadsAvailable;
+        public int WorkerThreadsMax;
+        public int CompletionPortThreadsMax;
+        public int WorkerThreadsMin;
+        public int CompletionPortThreadsMin;
     }
 }
